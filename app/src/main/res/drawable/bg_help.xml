@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Red Shadow -->
+    <item>
+        <shape android:shape="oval">
+            <size android:width="200dp" android:height="200dp"/>
+            <gradient
+                android:type="radial"
+                android:gradientRadius="130dp"
+                android:startColor="#40D6453E"
+                android:centerColor="#20D6453E"
+                android:endColor="#00D6453E"/>
+        </shape>
+    </item>
+
+    <!-- Red circle -->
+    <item android:left="10dp" android:right="10dp" android:top="10dp" android:bottom="10dp">
+        <shape android:shape="oval">
+            <solid android:color="#D6453E"/>
+        </shape>
+    </item>
+
+</layer-list>
