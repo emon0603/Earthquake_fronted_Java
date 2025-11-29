@@ -3,10 +3,7 @@
 
 
 
-    <item
-        android:id="@+id/bottom_weather"
-        android:icon="@drawable/ic_weather"
-        android:title="Weather" />
+
 
     <item
         android:id="@+id/bottom_emergency"
@@ -22,10 +19,6 @@
         android:id="@+id/bottom_earthquake"
         android:icon="@drawable/ic_earth"
         android:title="Quake" />
-    <item
-        android:id="@+id/bottom_more"
-        android:icon="@drawable/ic_more"
-        android:title="More" />
 
 
 

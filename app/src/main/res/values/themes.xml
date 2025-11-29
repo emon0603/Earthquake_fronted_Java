@@ -5,9 +5,9 @@
         <item name="android:windowIsTranslucent">true</item>
 
         <!-- Primary color -->
-        <item name="colorPrimary">#4F8EF5</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
         <!-- Dark Primary color (used in status bar) -->
-        <item name="colorPrimaryDark">#4F8EF5</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
         <!-- Accent color -->
         <item name="colorAccent">#E2136E</item>
         <!-- Color for activated controls -->
@@ -19,7 +19,7 @@
         <!-- Floating action button color -->
         <item name="colorSurface">#ffffff</item>
         <!-- Set RadioButton color -->
-        <item name="android:buttonTint">#4F8EF5</item>
+        <item name="android:buttonTint">@color/colorPrimary</item>
 
 
         <!-- Set default text color for AutoCompleteTextView -->

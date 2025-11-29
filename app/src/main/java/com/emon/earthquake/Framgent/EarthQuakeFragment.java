@@ -3,6 +3,9 @@ package com.emon.earthquake.Framgent;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -11,9 +14,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
+import com.emon.earthquake.Location.CurrentLocation;
 import com.emon.earthquake.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -22,6 +24,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -32,16 +35,15 @@ public class EarthQuakeFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private ProgressBar progressBar;
+    LinearLayout detail_layout;
+    View map_click;
 
     private static EarthQuakeFragment instance;
     private boolean mapInitialized = false;
     private boolean currentLocationShown = false;
 
-    public EarthQuakeFragment() {
-        // Required empty public constructor
-    }
+    public EarthQuakeFragment() { }
 
-    // Singleton instance for BottomNavigation optimization
     public static EarthQuakeFragment getInstance() {
         if (instance == null) {
             instance = new EarthQuakeFragment();
@@ -52,38 +54,43 @@ public class EarthQuakeFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true); // retain fragment during configuration changes
+        setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_earth_quake, container, false);
+        View Earthview = inflater.inflate(R.layout.fragment_earth_quake, container, false);
+        progressBar = Earthview.findViewById(R.id.progressBar);
+        detail_layout = Earthview.findViewById(R.id.detail_layout);
+        map_click = Earthview.findViewById(R.id.map);
 
-        progressBar = view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
+        detail_layout.setVisibility(View.GONE);
 
-        // Lazy initialization after 1 second delay
-        view.postDelayed(() -> {
+
+
+
+
+        // Delay map setup to ensure fragment is fully attached
+        Earthview.postDelayed(() -> {
             if (isAdded() && !mapInitialized) {
                 mapInitialized = true;
                 setupMap();
             }
-        }, 1000);
+        }, 500);
 
-        return view;
+        return Earthview;
     }
 
     private void setupMap() {
         if (!isAdded()) return;
 
-        // Initialize location client
         if (fusedLocationClient == null) {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         }
 
-        // Reuse existing map fragment or create new one
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
@@ -101,8 +108,31 @@ public class EarthQuakeFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Map fully loaded → hide progress bar
-        mMap.setOnMapLoadedCallback(() -> progressBar.setVisibility(View.GONE));
+        detail_layout.setAlpha(0f);
+
+        mMap.setOnMapLoadedCallback(() -> {
+            progressBar.setVisibility(View.GONE);
+
+            // Fade-in animation
+            detail_layout.setVisibility(View.VISIBLE);
+            detail_layout.animate()
+                    .alpha(1f)       // fade to fully visible
+                    .setDuration(500) // 500ms duration
+                    .start();
+        });
+
+        // User map click → hide detail layout
+        mMap.setOnMapClickListener(latLng -> {
+            if (detail_layout.getVisibility() == View.VISIBLE) {
+                detail_layout.animate()
+                        .alpha(0f) // fade out
+                        .setDuration(400) // 400ms duration
+                        .withEndAction(() -> detail_layout.setVisibility(View.GONE))
+                        .start();
+            }
+        });
+
+
 
         // Permission check
         if (ActivityCompat.checkSelfPermission(requireContext(),
@@ -121,31 +151,53 @@ public class EarthQuakeFragment extends Fragment implements OnMapReadyCallback {
         locations.add(new LatLng(22.3569, 91.7832)); // Chittagong
         locations.add(new LatLng(24.3636, 88.6241)); // Rajshahi
 
+        List<Marker> markers = new ArrayList<>();
         for (LatLng loc : locations) {
-            mMap.addMarker(new MarkerOptions().position(loc)
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(loc)
                     .title("Lat: " + loc.latitude + ", Lng: " + loc.longitude));
+            markers.add(marker);
         }
+
+        // Marker click listener
+        mMap.setOnMarkerClickListener(marker -> {
+            if (markers.contains(marker)) {
+                detail_layout.setVisibility(View.VISIBLE);
+                detail_layout.animate()
+                        .alpha(1f)       // fade to fully visible
+                        .setDuration(500) // 500ms duration
+                        .start();
+                Toast.makeText(getActivity(),
+                        "Clicked Location:\n" + marker.getTitle(),
+                        Toast.LENGTH_LONG).show();
+                return true;
+            }
+            return false;
+        });
 
         // Get current location once
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location != null && isAdded() && getActivity() != null) {
+
+                        // Save current location in Singleton
+                        CurrentLocation.getInstance().setLocation(
+                                location.getLatitude(), location.getLongitude()
+                        );
+
                         LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
                         mMap.addMarker(new MarkerOptions().position(current).title("You are here"));
 
-                        // Move camera only once
                         if (!currentLocationShown) {
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 6));
                             currentLocationShown = true;
 
-                            // Show current location Toast
                             Toast.makeText(getActivity(),
                                     "Current Location:\nLatitude: " + location.getLatitude() +
                                             "\nLongitude: " + location.getLongitude(),
                                     Toast.LENGTH_LONG).show();
                         }
                     } else {
-                        // If null, move camera to first predefined location
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 6));
                     }
                 });
@@ -156,7 +208,6 @@ public class EarthQuakeFragment extends Fragment implements OnMapReadyCallback {
                                            @NonNull int[] grantResults) {
         if (requestCode == 100 && grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
             setupMap();
         }
     }
