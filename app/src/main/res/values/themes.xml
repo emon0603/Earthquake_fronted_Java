@@ -1,0 +1,42 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Earthquake" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.Earthquake" parent="Base.Theme.Earthquake" />
+
+    <style name="BottomNavTextActive">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Inactive Text Size -->
+    <style name="BottomNavTextInactive">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="CustomTabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">@dimen/_10ssp</item> <!-- টেক্সট সাইজ ছোট করা হলো -->
+    </style>
+
+    <style name="FlatCornersNavigationView" parent="Widget.MaterialComponents.NavigationView">
+        <item name="shapeAppearance">@style/FlatShapeAppearance</item>
+    </style>
+
+    <style name="FlatShapeAppearance" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="NoRippleBottomNav" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemBackground">@android:color/transparent</item>
+        <item name="itemRippleColor">@null</item>
+        <item name="android:selectableItemBackground">@null</item>
+    </style>
+
+
+
+</resources>
