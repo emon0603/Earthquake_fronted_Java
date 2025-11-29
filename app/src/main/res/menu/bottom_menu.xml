@@ -5,26 +5,26 @@
 
     <item
         android:id="@+id/bottom_weather"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/ic_weather"
         android:title="Weather" />
 
     <item
         android:id="@+id/bottom_emergency"
-        android:icon="@drawable/ic_home"
-        android:title="Emergency" />
+        android:icon="@drawable/ic_sos"
+        android:title="Help" />
 
     <item
         android:id="@+id/bottom_home"
-        android:icon="@drawable/ic_home"
-        android:title="Home" />
+        android:title="Explore" />
+
 
     <item
         android:id="@+id/bottom_earthquake"
-        android:icon="@drawable/ic_home_t"
+        android:icon="@drawable/ic_earth"
         android:title="EarthQuake" />
     <item
         android:id="@+id/bottom_more"
-        android:icon="@drawable/baseline_headphones_24"
+        android:icon="@drawable/ic_more"
         android:title="More" />
 
 

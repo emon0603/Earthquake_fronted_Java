@@ -9,7 +9,7 @@
             <item android:gravity="bottom|center_horizontal">
                 <shape android:shape="oval">
                     <size android:width="6dp" android:height="6dp"/>
-                    <solid android:color="#FF0000"/>
+                    <solid android:color="#4F8EF5"/>
                 </shape>
             </item>
         </layer-list>

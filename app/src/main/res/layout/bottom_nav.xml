@@ -1,0 +1,128 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp">
+
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/BottomAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bottom_nav_background"
+            app:fabAlignmentMode="center"
+            app:fabAnchorMode="embed"
+
+            >
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigationView"
+                style="@style/NoRippleBottomNav"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:elevation="16dp"
+                app:itemBackground="@drawable/indicator_dot_shape"
+                app:itemTextAppearanceActive="@style/BottomNavTextActive"
+                app:itemTextAppearanceInactive="@style/BottomNavTextInactive"
+                app:labelVisibilityMode="selected"
+                app:menu="@menu/bottom_menu" />
+
+
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+
+
+
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:maxImageSize="60dp"
+            app:layout_anchor="@id/BottomAppBar"
+            app:layout_anchorGravity="center"
+            android:layout_marginBottom="@dimen/_25sdp"
+            android:src="@drawable/ic_home_big"
+            android:scaleType="centerCrop"
+            android:elevation="8dp"
+            app:shapeAppearanceOverlay="@style/CircleImageStyle"
+            app:tint="@null"
+            app:backgroundTint="@null"
+            app:rippleColor="@android:color/transparent"
+
+
+
+            />
+
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
+
+
+    <!--    <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/bottomNavigationView"/>
+
+
+
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/BottomAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="bottom"
+            app:fabAnchorMode="cradle"
+            app:fabAlignmentMode="center"
+            app:fabCradleVerticalOffset="20dp"
+            android:background="@android:color/transparent"
+
+            >
+
+            &lt;!&ndash; BottomNavigationView &ndash;&gt;
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:labelVisibilityMode="selected"
+            app:menu="@menu/bottom_menu"
+            android:elevation="16dp"
+            app:itemTextAppearanceActive="@style/BottomNavTextActive"
+            app:itemTextAppearanceInactive="@style/BottomNavTextInactive"
+            style="@style/NoRippleBottomNav"
+            app:itemBackground="@drawable/indicator_dot_shape"
+            android:background="@android:color/transparent"
+            />
+
+
+
+
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+
+
+        &lt;!&ndash; FloatingActionButton &ndash;&gt;
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:layout_anchorGravity="center"
+            android:layout_marginBottom="28dp"
+            android:src="@drawable/ic_home_big"
+            app:layout_anchor="@id/BottomAppBar"
+            />-->
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
