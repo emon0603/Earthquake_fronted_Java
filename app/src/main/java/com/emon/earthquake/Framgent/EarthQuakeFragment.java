@@ -1,66 +1,163 @@
 package com.emon.earthquake.Framgent;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.emon.earthquake.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link EarthQuakeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class EarthQuakeFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class EarthQuakeFragment extends Fragment implements OnMapReadyCallback {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private GoogleMap mMap;
+    private FusedLocationProviderClient fusedLocationClient;
+    private ProgressBar progressBar;
+
+    private static EarthQuakeFragment instance;
+    private boolean mapInitialized = false;
+    private boolean currentLocationShown = false;
 
     public EarthQuakeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment EarthQuakeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static EarthQuakeFragment newInstance(String param1, String param2) {
-        EarthQuakeFragment fragment = new EarthQuakeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    // Singleton instance for BottomNavigation optimization
+    public static EarthQuakeFragment getInstance() {
+        if (instance == null) {
+            instance = new EarthQuakeFragment();
+        }
+        return instance;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setRetainInstance(true); // retain fragment during configuration changes
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_earth_quake, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_earth_quake, container, false);
+
+        progressBar = view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
+        // Lazy initialization after 1 second delay
+        view.postDelayed(() -> {
+            if (isAdded() && !mapInitialized) {
+                mapInitialized = true;
+                setupMap();
+            }
+        }, 1000);
+
+        return view;
+    }
+
+    private void setupMap() {
+        if (!isAdded()) return;
+
+        // Initialize location client
+        if (fusedLocationClient == null) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        }
+
+        // Reuse existing map fragment or create new one
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
+        if (mapFragment == null) {
+            mapFragment = SupportMapFragment.newInstance();
+            getChildFragmentManager().beginTransaction()
+                    .add(R.id.map, mapFragment, "MAP_FRAGMENT")
+                    .commitNow();
+        }
+
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Map fully loaded → hide progress bar
+        mMap.setOnMapLoadedCallback(() -> progressBar.setVisibility(View.GONE));
+
+        // Permission check
+        if (ActivityCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+            return;
+        }
+
+        mMap.setMyLocationEnabled(true);
+
+        // Predefined markers
+        List<LatLng> locations = new ArrayList<>();
+        locations.add(new LatLng(23.8103, 90.4125)); // Dhaka
+        locations.add(new LatLng(22.3569, 91.7832)); // Chittagong
+        locations.add(new LatLng(24.3636, 88.6241)); // Rajshahi
+
+        for (LatLng loc : locations) {
+            mMap.addMarker(new MarkerOptions().position(loc)
+                    .title("Lat: " + loc.latitude + ", Lng: " + loc.longitude));
+        }
+
+        // Get current location once
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null && isAdded() && getActivity() != null) {
+                        LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(current).title("You are here"));
+
+                        // Move camera only once
+                        if (!currentLocationShown) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 6));
+                            currentLocationShown = true;
+
+                            // Show current location Toast
+                            Toast.makeText(getActivity(),
+                                    "Current Location:\nLatitude: " + location.getLatitude() +
+                                            "\nLongitude: " + location.getLongitude(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        // If null, move camera to first predefined location
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 6));
+                    }
+                });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == 100 && grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            setupMap();
+        }
     }
 }

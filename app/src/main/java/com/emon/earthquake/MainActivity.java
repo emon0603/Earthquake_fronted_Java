@@ -4,10 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 
+import com.emon.earthquake.Framgent.EarthQuakeFragment;
 import com.emon.earthquake.Framgent.EmergencyFragment;
 import com.emon.earthquake.Framgent.HomeFragment;
 import com.emon.earthquake.Framgent.MoreFragment;
 import com.emon.earthquake.Framgent.WeatherFragment;
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -15,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
     FloatingActionButton fab;
+    BottomAppBar bottomAppBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         fab = findViewById(R.id.fab);
+        bottomAppBar = findViewById(R.id.BottomAppBar);
 
         // Default fragment
         loadFragment(new HomeFragment());
@@ -49,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
                 loadFragment(new EmergencyFragment());
                 return true;
 
+            }else if (id == R.id.bottom_earthquake) {
+                loadFragment(new EarthQuakeFragment());
+                return true;
+
             } else if (id == R.id.bottom_more) {
                 loadFragment(new MoreFragment());
                 return true;
@@ -59,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadFragment(Fragment fragment) {
+
+        bottomAppBar.setBackgroundResource(R.drawable.bottom_nav_background);
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frameLayout, fragment)
                 .commit();
